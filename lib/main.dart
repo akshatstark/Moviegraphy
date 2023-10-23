@@ -4,11 +4,11 @@ import './pages/splash_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
-  runApp(SplashPage(
-      key: UniqueKey(),
-      onInitializationComplete: () => runApp(
-            ProviderScope(child: MyApp()),
-          )));
+  runApp(
+      SplashPage(key: UniqueKey(), onInitializationComplete: () => runApp(
+        ProviderScope(child: MyApp()),
+      ))
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -24,3 +24,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
