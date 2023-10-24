@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../model/search_category.dart';
+import '../model/movie.dart';
 
 class MainPage extends ConsumerWidget {
   late double _devHeight;
@@ -13,8 +14,14 @@ class MainPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef watch) {
-    _devHeight = MediaQuery.of(context).size.height;
-    _devWidth = MediaQuery.of(context).size.width;
+    _devHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
+    _devWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     _searchTextFieldController = TextEditingController();
     return buildUI();
   }
@@ -65,6 +72,11 @@ class MainPage extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _topBarWidget(),
+          Container(
+            height: _devHeight * 0.50, // here
+            padding: EdgeInsets.symmetric(vertical: _devHeight * 0.01),
+            child: _movieListViewWidget(),
+          )
         ],
       ),
     );
@@ -147,5 +159,41 @@ class MainPage extends ConsumerWidget {
         )
       ],
     );
+  }
+
+  Widget _movieListViewWidget() {
+    final List<Movie> _movies = [];
+
+    for (var i = 0; i < 20; i++) {
+      _movies.add(
+          Movie(name: "name",
+          language: "language",
+          isAdult: true,
+          description: "description",
+          posterPath: "posterPath",
+          backdropPath: "backdropPath",
+          rating: 8,
+          releaseDate: "releaseDate")
+      );
+    }
+    if (_movies.length != 0) {
+      return ListView.builder(itemCount: _movies.length,
+        itemBuilder: (BuildContext _context, int _count) {
+          return Padding(
+            padding: EdgeInsets.symmetric(
+                horizontal: 0, vertical: _devHeight * 0.01),
+            child: GestureDetector(onTap: () {},
+              child: Text(_movies[_count].name),
+            ),
+          );
+        },
+      );
+    } else {
+      return const Center(
+          child: CircularProgressIndicator(
+            backgroundColor: Colors.white24,
+          )
+      );
+    }
   }
 }
