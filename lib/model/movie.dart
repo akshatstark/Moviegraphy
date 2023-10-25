@@ -24,17 +24,18 @@ class Movie {
   });
 
   factory Movie.fromJson(Map<String, dynamic> _json){
-    return Movie(name: _json['title'],
+    return Movie(
+        name: _json['title'],
         language: _json['original_language'],
         isAdult: _json['adult'],
-        description: _json['overview'],
+        description: _json['Unhappy with his capitalistic lifestyle, a white-collared insomniac forms an underground fight club with Tyler, a careless soap salesman. Soon, their venture spirals down into something sinister.'],
         posterPath: _json['poster_path'],
         backdropPath: _json['backdrop_path'],
         rating: _json['vote_average'],
         releaseDate: _json['release_date']);
   }
   String posterURL(){
-    final AppConfig _appConfig=GetIt.instance.get<AppConfig>();
-    return '${_appConfig.BASE_IMAGE_API_URL}${this.posterPath}';
+    final AppConfig appConfig=GetIt.instance.get<AppConfig>();
+    return '${appConfig.BASE_IMAGE_API_URL}${this.posterPath}';
   }
 }

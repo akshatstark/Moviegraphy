@@ -7,6 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../model/search_category.dart';
 import '../model/movie.dart';
 
+import '../widget/movie_tile.dart';
+
 class MainPage extends ConsumerWidget {
   late double _devHeight;
   late double _devWidth;
@@ -14,20 +16,15 @@ class MainPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef watch) {
-    _devHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
-    _devWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    _devHeight = MediaQuery.of(context).size.height;
+    _devWidth = MediaQuery.of(context).size.width;
     _searchTextFieldController = TextEditingController();
     return buildUI();
   }
 
   Widget buildUI() {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Colors.black,
       body: Container(
         height: _devHeight,
@@ -64,17 +61,17 @@ class MainPage extends ConsumerWidget {
 
   Widget _foregroundWidget() {
     return Container(
-      padding: EdgeInsets.fromLTRB(0, _devHeight * 0.2, 0, 0),
-      width: _devWidth * 0.88,
+      padding: EdgeInsets.fromLTRB(0, _devHeight * 0.02, 0, 0),
+      width: _devWidth * 0.90,
       child: Column(
         mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.start, //here
+        mainAxisAlignment: MainAxisAlignment.end,                                //here
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _topBarWidget(),
           Container(
-            height: _devHeight * 0.50, // here
-            padding: EdgeInsets.symmetric(vertical: _devHeight * 0.01),
+            height: _devHeight* 0.85,                                            // here
+            padding: EdgeInsets.symmetric(vertical: _devHeight * 0.02),
             child: _movieListViewWidget(),
           )
         ],
@@ -91,7 +88,7 @@ class MainPage extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.center,
-        // check wht happens if u remove this
+        // check wht happens if u remove this =>  nothing much
         children: [
           _searchFieldWidget(),
           _categorySelectionWidget(),
@@ -165,25 +162,32 @@ class MainPage extends ConsumerWidget {
     final List<Movie> _movies = [];
 
     for (var i = 0; i < 20; i++) {
-      _movies.add(
-          Movie(name: "name",
-          language: "language",
+      _movies.add(Movie(
+          name: "Fight Club",
+          language: "En",
           isAdult: true,
-          description: "description",
-          posterPath: "posterPath",
-          backdropPath: "backdropPath",
+          description: "Unhappy with his capitalistic lifestyle, a white-collared insomniac forms an underground fight club with Tyler, a careless soap salesman. Soon, their venture spirals down into something sinister.",
+          posterPath: "/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg",
+          backdropPath: "/hZkgoQYus5vegHoetLkCJzb17zJ.jpg",
           rating: 8,
-          releaseDate: "releaseDate")
-      );
+          releaseDate: "22-07-10"));
     }
     if (_movies.length != 0) {
-      return ListView.builder(itemCount: _movies.length,
+      return ListView.builder(
+        itemCount: _movies.length,
         itemBuilder: (BuildContext _context, int _count) {
           return Padding(
             padding: EdgeInsets.symmetric(
                 horizontal: 0, vertical: _devHeight * 0.01),
-            child: GestureDetector(onTap: () {},
-              child: Text(_movies[_count].name),
+            child: GestureDetector(
+              onTap: () {},
+              child: Container(
+                child: MovieTile(
+                  movie: _movies[_count],
+                  height: _devHeight * 0.20,
+                  width: _devWidth * 0.85,    //here
+                ),
+              ),
             ),
           );
         },
@@ -191,9 +195,8 @@ class MainPage extends ConsumerWidget {
     } else {
       return const Center(
           child: CircularProgressIndicator(
-            backgroundColor: Colors.white24,
-          )
-      );
+        backgroundColor: Colors.white24,
+      ));
     }
   }
 }
