@@ -12,8 +12,7 @@ class MovieTile extends StatelessWidget {
   double? width;
   final Movie movie;
 
-  MovieTile({required this.movie, this.height, this.width});
-
+  MovieTile({super.key, required this.movie, this.height, this.width});
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -88,6 +87,9 @@ class MovieTile extends StatelessWidget {
         height: height,
         width: width !*0.30,
         decoration: BoxDecoration(
-            image: DecorationImage(image: NetworkImage(imageUrl))));
+            image: DecorationImage(image: NetworkImage(imageUrl)
+            )
+        )
+    );
   }
 }

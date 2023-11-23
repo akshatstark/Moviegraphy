@@ -1,39 +1,69 @@
 import 'dart:ui';
 
-import 'package:flutter/cupertino.dart';
+//Packages
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+//Widgets
+import '../model/main_page_data.dart';
+import '../widget/movie_tile.dart';
+
+//Models
 import '../model/search_category.dart';
 import '../model/movie.dart';
 
-import '../widget/movie_tile.dart';
+//Controllers
+import '../controllers/main_page_data_controller.dart';
+
+final mainPageDataControllerProvider =
+StateNotifierProvider<MainPageDataController, MainPageData>((ref) {
+  return MainPageDataController();
+});
+
+final selectedMoviePosterURLProvider = StateProvider<String?>((ref) {
+  final _movies = ref.watch(mainPageDataControllerProvider).movies!;
+  return _movies.length != 0 ? _movies[0].posterURL() : null;
+});
 
 class MainPage extends ConsumerWidget {
-  late double _devHeight;
-  late double _devWidth;
-  late TextEditingController _searchTextFieldController;
+  double? _deviceHeight;
+  double? _deviceWidth;
+
+  late var _selectedMoviePosterURL;
+
+  late MainPageDataController _mainPageDataController;
+  late MainPageData _mainPageData;
+
+  TextEditingController? _searchTextFieldController;
 
   @override
-  Widget build(BuildContext context, WidgetRef watch) {
-    _devHeight = MediaQuery.of(context).size.height;
-    _devWidth = MediaQuery.of(context).size.width;
+  Widget build(BuildContext context, WidgetRef ref) {
+    _deviceHeight = MediaQuery.of(context).size.height;
+    _deviceWidth = MediaQuery.of(context).size.width;
+
+    _mainPageDataController = ref.watch(mainPageDataControllerProvider.notifier);
+    _mainPageData = ref.watch(mainPageDataControllerProvider);
+    _selectedMoviePosterURL = ref.watch(selectedMoviePosterURLProvider);
+
     _searchTextFieldController = TextEditingController();
-    return buildUI();
+
+    _searchTextFieldController!.text = _mainPageData.searchText!;
+
+    return _buildUI();
   }
 
-  Widget buildUI() {
+  Widget _buildUI() {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.black,
       body: Container(
-        height: _devHeight,
-        width: _devWidth,
+        height: _deviceHeight,
+        width: _deviceWidth,
         child: Stack(
           alignment: Alignment.center,
           children: [
             _backgroundWidget(),
-            _foregroundWidget(),
+            _foregroundWidgets(),
           ],
         ),
       ),
@@ -41,38 +71,49 @@ class MainPage extends ConsumerWidget {
   }
 
   Widget _backgroundWidget() {
-    return Container(
-        height: _devHeight,
-        width: _devWidth,
+    if (_selectedMoviePosterURL != null) {
+      return Container(
+        height: _deviceHeight,
+        width: _deviceWidth,
         decoration: BoxDecoration(
-            image: const DecorationImage(
-              image: NetworkImage(
-                  'https://www.themoviedb.org/t/p/w220_and_h330_face/NNxYkU70HPurnNCSiCjYAmacwm.jpg'),
-              fit: BoxFit.cover,
-            ),
-            borderRadius: BorderRadius.circular(20)),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 20.0, sigmaY: 20.0),
-          child: Container(
-            decoration: BoxDecoration(color: Colors.black.withOpacity(0.2)),
+          borderRadius: BorderRadius.circular(10.0),
+          image: DecorationImage(
+            image: NetworkImage(_selectedMoviePosterURL),
+            fit: BoxFit.cover,
           ),
-        ));
+        ),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.2),
+            ),
+          ),
+        ),
+      );
+    } else {
+      return Container(
+        height: _deviceHeight,
+        width: _deviceWidth,
+        color: Colors.black,
+      );
+    }
   }
 
-  Widget _foregroundWidget() {
+  Widget _foregroundWidgets() {
     return Container(
-      padding: EdgeInsets.fromLTRB(0, _devHeight * 0.02, 0, 0),
-      width: _devWidth * 0.90,
+      padding: EdgeInsets.fromLTRB(0, _deviceHeight! * 0.02, 0, 0),
+      width: _deviceWidth! * 0.90,
       child: Column(
         mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.end,                                //here
+        mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _topBarWidget(),
           Container(
-            height: _devHeight* 0.85,                                            // here
-            padding: EdgeInsets.symmetric(vertical: _devHeight * 0.02),
-            child: _movieListViewWidget(),
+            height: _deviceHeight! * 0.83,
+            padding: EdgeInsets.symmetric(vertical: _deviceHeight! * 0.01),
+            child: _moviesListViewWidget(),
           )
         ],
       ),
@@ -81,14 +122,15 @@ class MainPage extends ConsumerWidget {
 
   Widget _topBarWidget() {
     return Container(
-      height: _devHeight * 0.08,
+      height: _deviceHeight! * 0.08,
       decoration: BoxDecoration(
-          color: Colors.black54, borderRadius: BorderRadius.circular(30)),
+        color: Colors.black54,
+        borderRadius: BorderRadius.circular(20.0),
+      ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
-        // check wht happens if u remove this =>  nothing much
         children: [
           _searchFieldWidget(),
           _categorySelectionWidget(),
@@ -100,38 +142,40 @@ class MainPage extends ConsumerWidget {
   Widget _searchFieldWidget() {
     final _border = InputBorder.none;
     return Container(
-      height: _devHeight * 0.05,
-      width: _devWidth * 0.50,
+      width: _deviceWidth! * 0.50,
+      height: _deviceHeight! * 0.05,
       child: TextField(
         controller: _searchTextFieldController,
-        onSubmitted: (input) {},
+        onSubmitted: (_input) =>
+            _mainPageDataController.updateTextSearch(_input),
         style: TextStyle(color: Colors.white),
         decoration: InputDecoration(
-          focusedBorder: _border,
-          border: _border,
-          prefixIcon: Icon(Icons.search, color: Colors.white54),
-          hintText: 'Search...',
-          hintStyle: TextStyle(color: Colors.white24),
-          filled: false,
-          fillColor: Colors.white24,
-        ),
+            focusedBorder: _border,
+            border: _border,
+            prefixIcon: Icon(Icons.search, color: Colors.white24),
+            hintStyle: TextStyle(color: Colors.white54),
+            filled: false,
+            fillColor: Colors.white24,
+            hintText: 'Search....'),
       ),
     );
   }
 
   Widget _categorySelectionWidget() {
     return DropdownButton(
-      value: SearchCategory.popular,
       dropdownColor: Colors.black38,
-      underline: Container(
-        height: 1,
-        color: Colors.white24,
-      ),
-      onChanged: (_value) {},
+      value: _mainPageData.searchCategory,
       icon: Icon(
         Icons.menu,
         color: Colors.white24,
       ),
+      underline: Container(
+        height: 1,
+        color: Colors.white24,
+      ),
+      onChanged: (dynamic _value) => _value.toString().isNotEmpty
+          ? _mainPageDataController.updateSearchCategory(_value)
+          : null,
       items: [
         DropdownMenuItem(
           child: Text(
@@ -153,50 +197,54 @@ class MainPage extends ConsumerWidget {
             style: TextStyle(color: Colors.white),
           ),
           value: SearchCategory.none,
-        )
+        ),
       ],
     );
   }
 
-  Widget _movieListViewWidget() {
-    final List<Movie> _movies = [];
+  Widget _moviesListViewWidget() {
+    final List<Movie> _movies = _mainPageData.movies!;
 
-    for (var i = 0; i < 20; i++) {
-      _movies.add(Movie(
-          name: "Fight Club",
-          language: "En",
-          isAdult: true,
-          description: "Unhappy with his capitalistic lifestyle, a white-collared insomniac forms an underground fight club with Tyler, a careless soap salesman. Soon, their venture spirals down into something sinister.",
-          posterPath: "/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg",
-          backdropPath: "/hZkgoQYus5vegHoetLkCJzb17zJ.jpg",
-          rating: 8,
-          releaseDate: "22-07-10"));
-    }
     if (_movies.length != 0) {
-      return ListView.builder(
-        itemCount: _movies.length,
-        itemBuilder: (BuildContext _context, int _count) {
-          return Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: 0, vertical: _devHeight * 0.01),
-            child: GestureDetector(
-              onTap: () {},
-              child: Container(
+      return NotificationListener(
+        onNotification: (dynamic _onScrollNotification) {
+          if (_onScrollNotification is ScrollEndNotification) {
+            final before = _onScrollNotification.metrics.extentBefore;
+            final max = _onScrollNotification.metrics.maxScrollExtent;
+            if (before == max) {
+              _mainPageDataController.getMovies();
+              return true;
+            }
+            return false;
+          }
+          return false;
+        },
+        child: ListView.builder(
+          itemCount: _movies.length,
+          itemBuilder: (BuildContext _context, int _count) {
+            return Padding(
+              padding: EdgeInsets.symmetric(
+                  vertical: _deviceHeight! * 0.01, horizontal: 0),
+              child: GestureDetector(
+                onTap: () {
+                  _selectedMoviePosterURL.state = _movies[_count].posterURL();
+                },
                 child: MovieTile(
                   movie: _movies[_count],
-                  height: _devHeight * 0.20,
-                  width: _devWidth * 0.85,    //here
+                  height: _deviceHeight! * 0.20,
+                  width: _deviceWidth! * 0.85,
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       );
     } else {
-      return const Center(
-          child: CircularProgressIndicator(
-        backgroundColor: Colors.white24,
-      ));
+      return Center(
+        child: CircularProgressIndicator(
+          backgroundColor: Colors.white,
+        ),
+      );
     }
   }
 }

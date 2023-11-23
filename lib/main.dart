@@ -3,6 +3,8 @@ import 'package:moviegraphy/pages/main_page.dart';
 import './pages/splash_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+
+
 void main() {
   runApp(
       SplashPage(key: UniqueKey(), onInitializationComplete: () => runApp(
@@ -20,7 +22,8 @@ class MyApp extends StatelessWidget {
       routes: {
         'home': (context) => MainPage(),
       },
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: ThemeData(primarySwatch: Colors.blue,
+      visualDensity: VisualDensity.adaptivePlatformDensity)
     );
   }
 }
