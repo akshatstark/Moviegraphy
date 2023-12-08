@@ -28,9 +28,15 @@ class HTTPService {
         _query.addAll(query);
       }
       return await dio.get(_url, queryParameters: _query);
-    } on DioError catch (e) {
-      print('Unable to perform get request.');
-      print('DioError:$e');
+    } on DioException
+    catch (e) {
+      print('Unable to perform GET request.');
+      print('DioError: $e');
+      throw e; // Rethrow the error to inform the calling code about the failure.
+    } catch (e) {
+      print('Unexpected error occurred: $e');
+      throw e; // Rethrow other exceptions as well.
     }
   }
+
 }

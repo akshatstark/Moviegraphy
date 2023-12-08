@@ -14,7 +14,7 @@ import '../service/movie_services.dart';
 
 class MainPageDataController extends StateNotifier<MainPageData> {
   MainPageDataController([MainPageData? state])
-      : super(state ?? MainPageData.inital()) {
+      : super(state ?? MainPageData.initState()) {
     getMovies();
   }
 

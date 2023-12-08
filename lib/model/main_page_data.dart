@@ -2,21 +2,21 @@ import './movie.dart';
 import './search_category.dart';
 
 class MainPageData{
-  final List<Movie>? movies;
+  final List<Movie> movies;
   final int? page;
   final String? searchCategory;
   final String? searchText;
 
-  MainPageData({this.movies,this.page,this.searchCategory,this.searchText});
+  MainPageData({required this.movies,this.page,this.searchCategory,this.searchText});
 
-  MainPageData.inital():
+  MainPageData.initState():
       movies=[],
       page=1,
       searchCategory=SearchCategory.popular,
       searchText='';
 
   MainPageData copyWith(
-      {List<Movie>? movies,
+      {required List<Movie> movies,
         int? page,
         String? searchCategory,
         String? searchText }) {

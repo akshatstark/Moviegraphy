@@ -28,7 +28,7 @@ class Movie {
         name: _json['title'],
         language: _json['original_language'],
         isAdult: _json['adult'],
-        description: _json['Unhappy with his capitalistic lifestyle, a white-collared insomniac forms an underground fight club with Tyler, a careless soap salesman. Soon, their venture spirals down into something sinister.'],
+        description: _json['overview'],
         posterPath: _json['poster_path'],
         backdropPath: _json['backdrop_path'],
         rating: _json['vote_average'],
@@ -36,6 +36,6 @@ class Movie {
   }
   String posterURL(){
     final AppConfig appConfig=GetIt.instance.get<AppConfig>();
-    return '${appConfig.BASE_IMAGE_API_URL}${this.posterPath}';
+    return '${appConfig.BASE_IMAGE_API_URL}$posterPath';
   }
 }

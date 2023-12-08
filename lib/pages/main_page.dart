@@ -1,11 +1,11 @@
 import 'dart:ui';
 
 //Packages
+import '/model/main_page_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 //Widgets
-import '../model/main_page_data.dart';
 import '../widget/movie_tile.dart';
 
 //Models

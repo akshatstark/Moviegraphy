@@ -1,28 +1,33 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+//Packages
+import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
+//Models
 import '../model/movie.dart';
 
 class MovieTile extends StatelessWidget {
-  final _getIt = GetIt.instance;
+  final GetIt _getIt = GetIt.instance;
 
-  double? height;
-  double? width;
-  final Movie movie;
+  final double? height;
+  final double? width;
+  final Movie? movie;
 
-  MovieTile({super.key, required this.movie, this.height, this.width});
+  MovieTile({this.movie, this.height, this.width});
+
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.max,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _moviePosterWidget(movie.posterURL()),
-        _movieInfoWidget(),
-      ],
+    return Container(
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _moviePosterWidget(movie!.posterURL()),
+          _movieInfoWidget(),
+        ],
+      ),
     );
   }
 
@@ -40,56 +45,58 @@ class MovieTile extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(
+              Container(
                 width: width! * 0.56,
                 child: Text(
-                  movie.name,
+                  movie!.name!,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w400,
-                  ),
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w400),
                 ),
               ),
               Text(
-                movie.rating.toString(),
+                movie!.rating.toStringAsFixed(1),
                 style: TextStyle(
-                    fontSize: 22,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w400),
-              )
+                  color: Colors.white,
+                  fontSize: 22,
+                ),
+              ),
             ],
           ),
           Container(
             padding: EdgeInsets.fromLTRB(0, height! * 0.02, 0, 0),
             child: Text(
-              '${movie.language.toUpperCase()} | R: ${movie.isAdult} ${movie.releaseDate}',
+              '${movie!.language!.toUpperCase()} | R: ${movie!.isAdult} | ${movie!.releaseDate}',
               style: TextStyle(color: Colors.white, fontSize: 12),
             ),
           ),
           Container(
             padding: EdgeInsets.fromLTRB(0, height! * 0.07, 0, 0),
-            child: Text(
-              movie.description,
-              maxLines: 9,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 10, color: Colors.white70),
+            child: Expanded(
+              child: Text(
+                movie!.description!,
+                maxLines: 9,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: Colors.white70, fontSize: 8),
+              ),
             ),
-          )
-        ],
+
+          )],
       ),
     );
   }
 
-  Widget _moviePosterWidget(String imageUrl) {
+  Widget _moviePosterWidget(String _imageUrl) {
     return Container(
-        height: height,
-        width: width !*0.30,
-        decoration: BoxDecoration(
-            image: DecorationImage(image: NetworkImage(imageUrl)
-            )
-        )
+      height: height,
+      width: width! * 0.35,
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: NetworkImage(_imageUrl),
+        ),
+      ),
     );
   }
 }
